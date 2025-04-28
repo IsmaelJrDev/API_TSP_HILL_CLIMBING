@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hill Climbing TSP</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+        }
+
+        .form-select,
+        .btn {
+            border-radius: 30px;
+        }
+
+        .btn-primary {
+            background: #4caf50;
+            border: none;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.75);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #388e3c;
+        }
+
+        .card-header {
+            background: #4caf50;
+            color: #fff;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .table {
+            color: #f5f5f5;
+        }
+
+        .alert {
+            border-radius: 15px;
+        }
+
+        h1,
+        h2,
+        h5 {
+            color: #ffffff;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        p,
+        label {
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-5">
+        <h1 class="text-center mb-4">Hill Climbing - TSP</h1>
+        <div class="card shadow-lg p-4">
+            <div class="mb-3">
+                <label for="ciudad_origen" class="form-label">Selecciona la ciudad de origen:</label>
+                <select id="ciudad_origen" class="form-select">
+                    <option value="Jiloyork">Jiloyork</option>
+                    <option value="Toluca">Toluca</option>
+                    <option value="Atlacomulco">Atlacomulco</option>
+                    <option value="Guadalajara">Guadalajara</option>
+                    <option value="Monterrey">Monterrey</option>
+                    <option value="QuintanaRoo">QuintanaRoo</option>
+                    <option value="Michohacan">Michohacan</option>
+                    <option value="Aguascalientes">Aguascalientes</option>
+                    <option value="CDMX">CDMX</option>
+                    <option value="QRO">QRO</option>
+                </select>
+            </div>
+            <button class="btn btn-primary w-100" onclick="calcularRuta()">Calcular Ruta</button>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="text-center">Resultado</h2>
+            <div id="resultado" class="mt-3">
+                <p class="text-center text-muted">Selecciona una ciudad y presiona "Calcular Ruta" para ver el
+                    resultado.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function calcularRuta() {
+            const ciudadOrigen = document.getElementById('ciudad_origen').value;
+
+            const response = await fetch('/api/hill_climbing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ciudad_origen: ciudadOrigen })
+            });
+
+            const data = await response.json();
+
+            const resultadoDiv = document.getElementById('resultado');
+            if (response.ok) {
+                resultadoDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h5 class="mb-0">Ruta Óptima Calculada</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Ciudad de Origen:</strong> ${ciudadOrigen}</p>
+                            <p><strong>Distancia Total:</strong> ${data.distancia_total.toFixed(2)} km</p>
+                            <h6>Ruta:</h6>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ciudad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.ruta_optima.map((ciudad, index) => `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td>${ciudad}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultadoDiv.innerHTML = `
+                    <div class="alert alert-danger text-center" role="alert">
+                        <strong>Error:</strong> ${data.error}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

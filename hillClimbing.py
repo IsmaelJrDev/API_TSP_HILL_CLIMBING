@@ -19,18 +19,21 @@ def evalua_ruta(ruta, coord):
     total += distancia(coord[ciudad1], coord[ciudad2])
     return total
 
-def hill_climbing(coord):
+def hill_climbing(coord, ciudad_origen):
+    # Crear la ruta inicial aleatoria
     ruta = list(coord.keys())
+    ruta.remove(ciudad_origen)
     random.shuffle(ruta)
+    ruta.insert(0, ciudad_origen)  # Asegurar que la ciudad de origen sea la primera
 
     mejora = True
     while mejora:
         mejora = False
         dist_actual = evalua_ruta(ruta, coord)
-        for i in range(0, len(ruta)):
+        for i in range(1, len(ruta)):  # No intercambiar la ciudad de origen
             if mejora:
                 break
-            for j in range(0, len(ruta)):
+            for j in range(1, len(ruta)):
                 if i != j:
                     ruta_tmp = ruta[:]
                     ruta_tmp[i], ruta_tmp[j] = ruta_tmp[j], ruta_tmp[i]
